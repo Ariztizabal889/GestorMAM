@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Biblioteca Completa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
+    <style>
+        .glass-nav { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); }
+        .dark .glass-nav { background: rgba(15, 23, 42, 0.8); }
+        .card-zoom:hover img { transform: scale(1.1); }
+        .card-zoom:hover .overlay { opacity: 1; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { transition: background-color 0.3s ease; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 min-h-screen font-sans text-slate-900 dark:text-slate-100">
+
+    <nav class="glass-nav sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 p-4 md:p-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-4">
+                <div class="bg-blue-600 text-white p-2 rounded-lg shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-black uppercase italic tracking-tighter">Mi <span class="text-blue-600">Biblioteca</span></h1>
+            </div>
+
+            <div class="flex bg-slate-200 dark:bg-slate-900 p-1 rounded-2xl border dark:border-slate-800 overflow-x-auto no-scrollbar max-w-full">
+                <button onclick="filtrar('todos')" class="tab-btn px-5 py-2 rounded-xl text-[9px] font-black uppercase transition-all bg-blue-600 text-white shadow-lg" data-type="todos">Todos</button>
+                <button onclick="filtrar('Serie')" class="tab-btn px-5 py-2 rounded-xl text-[9px] font-black uppercase text-slate-500" data-type="Serie">Series</button>
+                <button onclick="filtrar('Anime')" class="tab-btn px-5 py-2 rounded-xl text-[9px] font-black uppercase text-slate-500" data-type="Anime">Anime</button>
+                <button onclick="filtrar('Pelicula')" class="tab-btn px-5 py-2 rounded-xl text-[9px] font-black uppercase text-slate-500" data-type="Pelicula">Películas</button>
+                <button onclick="filtrar('Libro')" class="tab-btn px-5 py-2 rounded-xl text-[9px] font-black uppercase text-slate-500" data-type="Libro">Libros</button>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <button onclick="document.documentElement.classList.toggle('dark')" class="p-2 bg-white dark:bg-slate-800 rounded-xl shadow-sm border dark:border-slate-700">🌙</button>
+                <a href="index.html" class="bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest">Panel</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-10">
+        <div class="mb-12">
+            <input type="text" id="search-input" onkeyup="buscarEnBiblioteca()" 
+                placeholder="¿Qué quieres ver o leer hoy?..." 
+                class="w-full bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-xl border-none outline-none focus:ring-4 focus:ring-blue-500/20 text-lg font-bold transition-all">
+        </div>
+
+        <div id="gallery-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+            </div>
+
+        <div id="empty-state" class="hidden text-center py-40">
+            <h2 class="text-2xl font-black uppercase text-slate-400 italic">Estantería Vacía</h2>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+        const USER_ID = localStorage.getItem('user_id');
+        let totalContenido = [];
+
+        window.onload = () => {
+            if (!USER_ID) window.location.href = 'login.html';
+            cargarTodo();
+        };
+
+        async function cargarTodo() {
+            try {
+                const res = await fetch(`${API_URL}/media/usuario/${USER_ID}`);
+                const data = await res.json();
+                totalContenido = data.datos;
+                renderizar(totalContenido);
+            } catch (e) { console.error(e); }
+        }
+
+        function renderizar(items) {
+            const grid = document.getElementById('gallery-grid');
+            const empty = document.getElementById('empty-state');
+            grid.innerHTML = "";
+
+            if (items.length === 0) {
+                empty.classList.remove('hidden');
+                return;
+            } else {
+                empty.classList.add('hidden');
+            }
+
+            items.forEach(item => {
+                const img = item.cover_image_url || 'https://via.placeholder.com/300x450?text=Sin+Portada';
+                
+                // Colores por tipo
+                let color = 'bg-blue-600';
+                if(item.media_type === 'Anime') color = 'bg-orange-500';
+                if(item.media_type === 'Libro') color = 'bg-emerald-600';
+                if(item.media_type === 'Pelicula') color = 'bg-purple-600';
+
+                const div = document.createElement('div');
+                div.className = "card-zoom group relative bg-white dark:bg-slate-900 rounded-[1.5rem] overflow-hidden shadow-md transition-all duration-300";
+                div.innerHTML = `
+                    <div class="aspect-[2/3] overflow-hidden">
+                        <img src="${img}" class="w-full h-full object-cover transition-transform duration-700">
+                        <div class="overlay absolute inset-0 bg-slate-950/80 opacity-0 transition-opacity duration-300 flex flex-col justify-center items-center p-4 text-center">
+                            <span class="${color} text-white text-[7px] font-black px-2 py-1 rounded-md uppercase mb-3 tracking-widest">${item.media_type}</span>
+                            <h3 class="text-white font-black uppercase italic text-xs mb-4 line-clamp-3">${item.title}</h3>
+                            <a href="detalle.html?id=${item.id}" class="bg-blue-600 text-white font-black py-2 px-4 rounded-lg text-[9px] uppercase tracking-widest hover:bg-blue-500 transition-all">Abrir</a>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function filtrar(tipo) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                const active = btn.getAttribute('data-type') === tipo;
+                btn.className = active ? "tab-btn px-5 py-2 rounded-xl text-[9px] font-black uppercase transition-all bg-blue-600 text-white shadow-lg" : "tab-btn px-5 py-2 rounded-xl text-[9px] font-black uppercase text-slate-500";
+            });
+            const filtrados = tipo === 'todos' ? totalContenido : totalContenido.filter(i => i.media_type === tipo);
+            renderizar(filtrados);
+        }
+
+        function buscarEnBiblioteca() {
+            const q = document.getElementById('search-input').value.toLowerCase();
+            const filtrados = totalContenido.filter(i => i.title.toLowerCase().includes(q));
+            renderizar(filtrados);
+        }
+    </script>
+</body>
+</html>

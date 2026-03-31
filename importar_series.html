@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo Maestro - Datos Exactos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
+    <style>
+        body { transition: background-color 0.3s ease; }
+        .row-hover:hover { background-color: rgba(37, 99, 235, 0.08); }
+        .img-mini { width: 50px; height: 70px; object-fit: cover; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 min-h-screen font-sans text-slate-900 dark:text-slate-100">
+
+    <nav class="p-6 max-w-7xl mx-auto flex justify-between items-center border-b dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 sticky top-0 z-50 backdrop-blur-md">
+        <div class="flex items-center space-x-4">
+            <a href="index.html" class="text-blue-600 font-black uppercase text-[10px] tracking-widest bg-blue-50 dark:bg-blue-900/20 px-4 py-2 rounded-xl">⬅ Mi Biblioteca</a>
+            <h1 class="text-xl font-black uppercase italic tracking-tighter text-blue-600">Catálogo <span class="text-slate-400">Series,Peliculas y Animes </span></h1>
+        </div>
+        
+        <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border dark:border-slate-700">
+            <button onclick="setModo('tv')" id="btn-tv" class="px-6 py-2 rounded-xl text-[10px] font-black uppercase transition-all">Series / TV</button>
+            <button onclick="setModo('anime')" id="btn-anime" class="px-6 py-2 rounded-xl text-[10px] font-black uppercase transition-all">Anime</button>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-6 py-10">
+        <div class="mb-10 flex gap-4 bg-white dark:bg-slate-900 p-4 rounded-[2rem] shadow-sm border dark:border-slate-800">
+            <input type="text" id="input-q" onkeyup="if(event.key==='Enter') iniciarBusqueda()" placeholder="Escribe el nombre del contenido..." class="flex-1 bg-transparent px-4 font-bold outline-none">
+            <button onclick="iniciarBusqueda()" class="bg-blue-600 text-white px-8 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg hover:bg-blue-700 transition-all">Buscar</button>
+        </div>
+
+        <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl overflow-hidden border dark:border-slate-800">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-100 dark:bg-slate-800/50 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                        <th class="p-6 text-center">Miniatura</th>
+                        <th class="p-6">Título</th>
+                        <th class="p-6">Episodios</th>
+                        <th class="p-6">Año</th>
+                        <th class="p-6 text-right">Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-body" class="divide-y dark:divide-slate-800 text-sm"></tbody>
+            </table>
+            <div id="loader" class="p-12 text-center font-black uppercase text-slate-400 text-[10px] tracking-[0.3em]">
+                <span id="loader-text">Esperando búsqueda...</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_LOCAL = "http://127.0.0.1:8000";
+        const USER_ID = localStorage.getItem('user_id');
+        let modoActual = 'anime';
+        let paginaActual = 1;
+        let cargando = false;
+        let query = "";
+
+        window.onload = () => {
+            if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+            setModo('anime');
+        };
+
+        function setModo(m) {
+            modoActual = m;
+            paginaActual = 1;
+            query = "";
+            document.getElementById('input-q').value = "";
+            document.getElementById('tabla-body').innerHTML = "";
+            const btnTv = document.getElementById('btn-tv');
+            const btnAnime = document.getElementById('btn-anime');
+            
+            btnTv.className = m === 'tv' ? "px-6 py-2 rounded-xl text-[10px] font-black uppercase bg-blue-600 text-white shadow-lg" : "px-6 py-2 rounded-xl text-[10px] font-black uppercase text-slate-500";
+            btnAnime.className = m === 'anime' ? "px-6 py-2 rounded-xl text-[10px] font-black uppercase bg-blue-600 text-white shadow-lg" : "px-6 py-2 rounded-xl text-[10px] font-black uppercase text-slate-500";
+            
+            fetchDatos();
+        }
+
+        function iniciarBusqueda() {
+            query = document.getElementById('input-q').value;
+            paginaActual = 1;
+            document.getElementById('tabla-body').innerHTML = "";
+            fetchDatos();
+        }
+
+        async function fetchDatos() {
+            if (cargando) return;
+            cargando = true;
+            document.getElementById('loader-text').textContent = "Buscando...";
+
+            try {
+                let url = modoActual === 'anime' 
+                    ? (query ? `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&page=${paginaActual}` : `https://api.jikan.moe/v4/top/anime?page=${paginaActual}`)
+                    : (query ? `https://api.tvmaze.com/search/shows?q=${encodeURIComponent(query)}` : `https://api.tvmaze.com/shows?page=${paginaActual-1}`);
+
+                const res = await fetch(url);
+                const data = await res.json();
+                const items = modoActual === 'anime' ? data.data : (query ? data.map(i => i.show) : data);
+
+                renderTable(items);
+            } catch (e) { console.error(e); }
+            finally {
+                cargando = false;
+                document.getElementById('loader-text').textContent = "Desliza para cargar más";
+            }
+        }
+
+        function renderTable(items) {
+            const tbody = document.getElementById('tabla-body');
+            items.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "row-hover transition-colors";
+                
+                const id = modoActual === 'anime' ? item.mal_id : item.id;
+                const title = modoActual === 'anime' ? item.title : item.name;
+                const img = modoActual === 'anime' ? item.images.jpg.image_url : (item.image ? item.image.medium : 'https://via.placeholder.com/210x295');
+                const episodes = modoActual === 'anime' ? (item.episodes || '??') : 'Serie';
+                const year = modoActual === 'anime' ? (item.year || 'N/A') : (item.premiered ? item.premiered.split('-')[0] : 'N/A');
+
+                tr.innerHTML = `
+                    <td class="p-4 flex justify-center"><img src="${img}" class="img-mini shadow-md"></td>
+                    <td class="p-6 font-black uppercase italic">${title}</td>
+                    <td class="p-6 text-[10px] font-bold text-blue-500 uppercase tracking-widest">${episodes} Capítulos</td>
+                    <td class="p-6 text-xs font-black text-slate-400">${year}</td>
+                    <td class="p-6 text-right">
+                        <button onclick="importarExacto('${id}', '${title.replace(/'/g, "\\'")}', '${img}')" 
+                            class="bg-blue-600 hover:bg-green-600 text-white px-6 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all shadow-lg active:scale-95">
+                            Añadir
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function importarExacto(id, titulo, imagen) {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = "Sincronizando...";
+
+            try {
+                let total_eps = 0;
+                let eps_por_temporada = {};
+
+                if (modoActual === 'anime') {
+                    // LLAMADA FULL PARA OBTENER EL DATO REAL (Ej: los 1115 de One Piece)
+                    const res = await fetch(`https://api.jikan.moe/v4/anime/${id}/full`);
+                    const data = await res.json();
+                    
+                    // Si MyAnimeList dice que tiene 1115, guardamos 1115.
+                    total_eps = data.data.episodes || 0;
+                    eps_por_temporada = { "1": total_eps };
+                } else {
+                    // PARA SERIES TVMAZE: Contamos episodios reales de todas las temporadas
+                    const res = await fetch(`https://api.tvmaze.com/shows/${id}?embed=episodes`);
+                    const data = await res.json();
+                    data._embedded.episodes.forEach(ep => {
+                        eps_por_temporada[ep.season] = (eps_por_temporada[ep.season] || 0) + 1;
+                    });
+                }
+
+                const payload = {
+                    user_id: USER_ID,
+                    title: titulo,
+                    media_type: modoActual === 'anime' ? 'Anime' : 'Serie',
+                    cover_image_url: imagen,
+                    total_seasons: Object.keys(eps_por_temporada).length || 1,
+                    total_episodes: eps_por_temporada,
+                    status: 'pendiente'
+                };
+
+                const resSave = await fetch(`${API_LOCAL}/media/`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+
+                if (resSave.ok) {
+                    btn.textContent = "¡Añadido!";
+                    btn.classList.replace('bg-blue-600', 'bg-green-500');
+                }
+            } catch (e) {
+                btn.disabled = false;
+                btn.textContent = "Reintentar";
+            }
+        }
+
+        window.onscroll = () => {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+                paginaActual++;
+                if (modoActual === 'anime') fetchDatos();
+            }
+        };
+    </script>
+</body>
+</html>

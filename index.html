@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Biblioteca Pro - Panel de Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+    <style>
+        .active-pill { background-color: #2563eb !important; color: white !important; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); }
+        .tarjeta-contenido { transition: all 0.3s ease; }
+        .tarjeta-contenido:hover { transform: translateY(-5px); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { transition: background-color 0.3s ease, color 0.3s ease; }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 font-sans pb-20 text-gray-900 dark:text-gray-100">
+
+    <nav class="bg-white dark:bg-gray-800 shadow-md p-4 md:p-6 sticky top-0 z-50 transition-colors">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            
+            <div class="flex flex-wrap items-center justify-center gap-2">
+                <h1 class="text-xl md:text-3xl font-black tracking-tighter text-blue-600 italic uppercase mr-2">🎬 GestorMAM</h1>
+                
+                <a href="biblioteca.html" class="bg-slate-100 dark:bg-gray-700 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-gray-600 transition shadow-sm">🖼️ Galería</a>
+                
+                <a href="Importar_series.html" class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-blue-200 transition shadow-sm">📺 Series y ⛩️ Anime</a>
+                                
+                <a href="Importar_libros.html" class="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-3 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-emerald-200 transition shadow-sm">📚 Libros</a>
+            </div>
+
+            <div class="flex items-center space-x-2">
+                <a href="notas_generales.html" class="bg-yellow-400 text-yellow-900 px-3 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-yellow-300 transition shadow-sm">📝 Notas</a>
+                
+                <button onclick="exportarBiblioteca()" class="bg-green-600 text-white px-3 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-green-500 transition shadow-sm flex items-center">
+                    📊 <span class="hidden lg:inline ml-1">Exportar</span>
+                </button>
+
+                <div class="h-8 w-[1px] bg-gray-200 dark:bg-gray-700 mx-1"></div>
+
+                <button onclick="toggleDarkMode()" id="dark-mode-btn" class="p-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all text-lg">🌙</button>
+                
+                <button onclick="cerrarSesion()" class="text-red-500 font-black text-[9px] uppercase tracking-widest hover:underline decoration-2 underline-offset-4 cursor-pointer">Cerrar</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-6xl mx-auto px-4 mt-8">
+        
+        <details class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm mb-8 border border-gray-200 dark:border-gray-700 overflow-hidden group transition-colors">
+            <summary class="list-none p-6 cursor-pointer font-black text-gray-700 dark:text-gray-300 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 uppercase text-xs tracking-widest">
+                <span>✨ Añadir Manualmente</span>
+                <span class="group-open:rotate-180 transition-transform">▼</span>
+            </summary>
+            <div class="p-6 border-t border-gray-100 dark:border-gray-700">
+                <form id="formulario-media" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <input type="text" id="title" required placeholder="Título" class="w-full rounded-2xl border dark:border-gray-600 p-4 text-lg bg-gray-50 dark:bg-gray-700 outline-none focus:ring-2 focus:ring-blue-500 font-bold">
+                    <select id="media_type" class="w-full rounded-2xl border dark:border-gray-600 p-4 text-lg bg-gray-50 dark:bg-gray-700 font-black uppercase" onchange="alternarCamposForm(this.value)">
+                        <option value="Serie">Serie</option>
+                        <option value="Anime">Anime</option>
+                        <option value="Pelicula">Película</option>
+                        <option value="Libro">Libro</option>
+                    </select>
+                    <input type="url" id="cover_image_url" placeholder="URL Imagen Portada" class="md:col-span-2 w-full rounded-2xl border dark:border-gray-600 p-4 text-sm bg-gray-50 dark:bg-gray-700 outline-none">
+                    
+                    <div id="campos-series" class="md:col-span-2 grid grid-cols-2 gap-4">
+                        <input type="number" id="total_seasons" value="1" placeholder="Temps Totales" class="rounded-2xl border dark:border-gray-600 p-4 font-bold dark:bg-gray-700">
+                        <input type="number" id="total_episodes" placeholder="Episodios Totales" class="rounded-2xl border dark:border-gray-600 p-4 font-bold dark:bg-gray-700">
+                    </div>
+                    <div id="campos-libros" class="md:col-span-2 hidden">
+                        <input type="number" id="total_pages" placeholder="Total Páginas" class="w-full rounded-2xl border dark:border-gray-600 p-4 font-bold dark:bg-gray-700">
+                    </div>
+                    
+                    <button type="submit" class="md:col-span-2 w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-xl uppercase tracking-[0.2em] hover:bg-blue-700 transition-all active:scale-95 text-xs">Guardar en Biblioteca</button>
+                </form>
+            </div>
+        </details>
+
+        <div class="mb-10 space-y-6">
+            <input type="text" id="buscador" onkeyup="filtrarTodo()" placeholder="🔍 Buscar en mi colección..." class="w-full p-5 rounded-[2rem] border-none shadow-md text-xl outline-none focus:ring-4 focus:ring-blue-100 dark:bg-gray-800 dark:text-white transition-all font-bold">
+            <div class="flex flex-wrap gap-4 items-center justify-between">
+                <div class="flex bg-white dark:bg-gray-800 rounded-2xl p-1 shadow-sm border border-gray-200 dark:border-gray-700 overflow-x-auto no-scrollbar">
+                    <button onclick="setFiltro('cat', 'todos')" class="filter-btn filter-btn-cat active-pill px-6 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap" data-val="todos">Todos</button>
+                    <button onclick="setFiltro('cat', 'Serie')" class="filter-btn filter-btn-cat px-6 py-2 rounded-xl text-[10px] font-black uppercase text-gray-400 dark:text-gray-500 whitespace-nowrap" data-val="Serie">Series</button>
+                    <button onclick="setFiltro('cat', 'Anime')" class="filter-btn filter-btn-cat px-6 py-2 rounded-xl text-[10px] font-black uppercase text-gray-400 dark:text-gray-500 whitespace-nowrap" data-val="Anime">Anime</button>
+                    <button onclick="setFiltro('cat', 'Libro')" class="filter-btn filter-btn-cat px-6 py-2 rounded-xl text-[10px] font-black uppercase text-gray-400 dark:text-gray-500 whitespace-nowrap" data-val="Libro">Libros</button>
+                    <button onclick="setFiltro('cat', 'Pelicula')" class="filter-btn filter-btn-cat px-6 py-2 rounded-xl text-[10px] font-black uppercase text-gray-400 dark:text-gray-500 whitespace-nowrap" data-val="Pelicula">Películas</button>
+                </div>
+                <div id="contador-resultados" class="text-[10px] font-black text-gray-400 uppercase tracking-widest">0 RESULTADOS</div>
+            </div>
+        </div>
+
+        <div id="lista-media" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"></div>
+    </div>
+
+    <div id="modal-editar" class="fixed inset-0 bg-black/80 hidden flex justify-center items-center z-[100] p-4 backdrop-blur-md">
+        <div class="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] shadow-2xl w-full max-w-md border border-gray-100 dark:border-gray-700">
+            <h2 class="text-2xl font-black mb-6 uppercase italic text-gray-800 dark:text-white tracking-tighter text-center">Editar Registro</h2>
+            <form id="form-editar" class="space-y-4">
+                <input type="text" id="edit-title" required class="w-full rounded-2xl border dark:border-gray-600 p-4 font-bold outline-none dark:bg-gray-700 text-gray-900 dark:text-white uppercase text-center">
+                <input type="url" id="edit-cover-url" class="w-full rounded-2xl border dark:border-gray-600 p-3 text-sm outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
+                <div id="edit-campos-series" class="hidden grid grid-cols-2 gap-4">
+                    <input type="number" id="edit-total-seasons" placeholder="Temps" class="border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
+                    <input type="number" id="edit-total-episodes" placeholder="Episodios" class="border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
+                </div>
+                <div id="edit-campos-libros" class="hidden">
+                    <input type="number" id="edit-total-pages" placeholder="Páginas totales" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700 text-center text-gray-900 dark:text-white">
+                </div>
+                <div class="flex justify-center space-x-4 mt-8 pt-4 border-t dark:border-gray-700">
+                    <button type="button" onclick="cerrarModalEdicion()" class="text-gray-400 font-black uppercase text-[10px] tracking-widest">Cancelar</button>
+                    <button type="submit" class="bg-blue-600 text-white px-8 py-4 rounded-2xl font-black uppercase text-[10px] shadow-lg tracking-widest active:scale-95">Actualizar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+
+        // --- SESIÓN ---
+        window.cerrarSesion = function() {
+            localStorage.removeItem('user_id');
+            window.location.replace('login.html');
+        };
+
+        const USER_ID = localStorage.getItem('user_id');
+        if (!USER_ID) window.location.replace('login.html');
+
+        let misContenidos = [];
+        let itemAEditar = null;
+        let filtroCategoria = 'todos';
+
+        // --- MODO OSCURO ---
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const btn = document.getElementById('dark-mode-btn');
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                btn.innerHTML = '🌙';
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                btn.innerHTML = '☀️';
+            }
+        }
+
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            const dmBtn = document.getElementById('dark-mode-btn');
+            if(dmBtn) dmBtn.innerHTML = '☀️';
+        }
+
+        // --- EXPORTAR ---
+        function exportarBiblioteca() {
+            if (misContenidos.length === 0) return alert("No hay datos");
+            let csv = "data:text/csv;charset=utf-8,Titulo,Tipo,Estado,Progreso\n";
+            misContenidos.forEach(item => {
+                let progreso = item.media_type === "Libro" ? item.current_page : `T${item.current_season}-E${item.current_episode}`;
+                csv += `"${item.title}",${item.media_type},${item.status},${progreso}\n`;
+            });
+            const link = document.createElement("a");
+            link.href = encodeURI(csv);
+            link.download = "Biblioteca.csv";
+            link.click();
+        }
+
+        function alternarCamposForm(cat) {
+            document.getElementById("campos-series").classList.toggle("hidden", cat === "Pelicula" || cat === "Libro");
+            document.getElementById("campos-libros").classList.toggle("hidden", cat !== "Libro");
+        }
+
+        async function cargarContenido() {
+            try {
+                const res = await fetch(`${API_URL}/media/usuario/${USER_ID}`);
+                const data = await res.json();
+                misContenidos = data.datos;
+                const contenedor = document.getElementById("lista-media");
+                contenedor.innerHTML = "";
+
+                misContenidos.forEach(item => {
+                    const img = item.cover_image_url || 'https://via.placeholder.com/300x450?text=Sin+Portada';
+                    let progreso = item.media_type === "Libro" ? `Pág. ${item.current_page}` : (item.media_type === "Pelicula" ? "Cine" : `T${item.current_season}-E${item.current_episode}`);
+
+                    const div = document.createElement('div');
+                    div.className = "tarjeta-contenido group bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm overflow-hidden flex flex-col relative border border-gray-100 dark:border-gray-700 transition-colors";
+                    div.setAttribute('data-titulo', item.title);
+                    div.setAttribute('data-categoria', item.media_type);
+
+                    div.innerHTML = `
+                        <div class="absolute top-4 right-4 flex space-x-2 z-20">
+                            <button onclick="abrirModalEdicion('${item.id}')" class="bg-white/90 dark:bg-gray-700 text-blue-600 dark:text-blue-400 w-10 h-10 rounded-full shadow-lg flex items-center justify-center font-bold">✏️</button>
+                            <button onclick="borrarDirecto('${item.id}', '${item.title.replace(/'/g, "\\'")}')" class="bg-white/90 dark:bg-gray-700 text-red-500 w-10 h-10 rounded-full shadow-lg flex items-center justify-center font-bold">🗑️</button>
+                        </div>
+                        <div class="h-80 w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" style="background-image: url('${img}')"></div>
+                        <div class="p-6 flex-1 flex flex-col">
+                            <span class="text-[10px] font-black text-blue-500 dark:text-blue-400 uppercase tracking-widest mb-1">${item.media_type}</span>
+                            <h3 class="title-text font-black text-gray-900 dark:text-white text-xl leading-tight mb-4 italic uppercase line-clamp-2"></h3>
+                            <div class="flex justify-between items-center mt-auto bg-gray-50 dark:bg-gray-700 p-3 rounded-2xl font-black text-xs">
+                                <span class="text-gray-400 uppercase tracking-tighter">${item.status}</span>
+                                <span class="text-blue-600 dark:text-blue-400 font-black">${progreso}</span>
+                            </div>
+                            <a href="detalle.html?id=${item.id}" class="mt-5 block text-center bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-[10px] font-black py-4 rounded-2xl hover:bg-blue-600 transition-all uppercase tracking-widest shadow-lg">Detalles</a>
+                        </div>
+                    `;
+                    div.querySelector('.title-text').textContent = item.title;
+                    contenedor.appendChild(div);
+                });
+                filtrarTodo();
+            } catch (e) { console.error(e); }
+        }
+
+        async function borrarDirecto(id, titulo) {
+            if (confirm(`¿Eliminar "${titulo}"?`)) {
+                await fetch(`${API_URL}/media/${id}`, { method: 'DELETE' });
+                cargarContenido();
+            }
+        }
+
+        function abrirModalEdicion(id) {
+            const item = misContenidos.find(i => i.id === id);
+            itemAEditar = item;
+            document.getElementById('edit-title').value = item.title;
+            document.getElementById('edit-cover-url').value = item.cover_image_url || '';
+            const esVideo = item.media_type === "Serie" || item.media_type === "Anime";
+            const esLibro = item.media_type === "Libro";
+            document.getElementById('edit-campos-series').classList.toggle('hidden', !esVideo);
+            document.getElementById('edit-campos-libros').classList.toggle('hidden', !esLibro);
+            document.getElementById('modal-editar').classList.remove('hidden');
+        }
+
+        function cerrarModalEdicion() { document.getElementById('modal-editar').classList.add('hidden'); }
+
+        document.getElementById('form-editar').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const datos = {
+                ...itemAEditar,
+                title: document.getElementById('edit-title').value,
+                cover_image_url: document.getElementById('edit-cover-url').value || null,
+                total_seasons: parseInt(document.getElementById('edit-total-seasons').value) || 1,
+                total_pages: parseInt(document.getElementById('edit-total-pages').value) || null
+            };
+            await fetch(`${API_URL}/media/${itemAEditar.id}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(datos) });
+            cerrarModalEdicion(); cargarContenido();
+        });
+
+        document.getElementById("formulario-media").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const item = {
+                user_id: USER_ID,
+                title: document.getElementById("title").value,
+                media_type: document.getElementById("media_type").value,
+                cover_image_url: document.getElementById("cover_image_url").value || null,
+                total_seasons: parseInt(document.getElementById("total_seasons").value) || 1,
+                total_episodes: {}, 
+                total_pages: parseInt(document.getElementById("total_pages").value) || null
+            };
+            await fetch(`${API_URL}/media/`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(item) });
+            document.getElementById("formulario-media").reset();
+            cargarContenido();
+        });
+
+        function setFiltro(tipo, valor) {
+            filtroCategoria = valor;
+            document.querySelectorAll('.filter-btn-cat').forEach(b => b.classList.remove('active-pill'));
+            document.querySelector(`.filter-btn-cat[data-val="${valor}"]`).classList.add('active-pill');
+            filtrarTodo();
+        }
+
+        function filtrarTodo() {
+            const texto = document.getElementById('buscador').value.toLowerCase();
+            const tarjetas = document.querySelectorAll('.tarjeta-contenido');
+            let visibles = 0;
+            tarjetas.forEach(t => {
+                const mT = t.getAttribute('data-titulo').toLowerCase().includes(texto);
+                const mC = filtroCategoria === 'todos' || t.getAttribute('data-categoria') === filtroCategoria;
+                if (mT && mC) { t.style.display = "flex"; visibles++; } else { t.style.display = "none"; }
+            });
+            document.getElementById('contador-resultados').textContent = `${visibles} RESULTADOS`;
+        }
+
+        cargarContenido();
+    </script>
+</body>
+</html>

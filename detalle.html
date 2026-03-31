@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Contenido</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <style>
+        body { transition: background-color 0.3s ease, color 0.3s ease; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 font-sans pb-20 text-gray-900 dark:text-gray-100">
+
+    <nav class="bg-white dark:bg-gray-800 shadow-md p-4 flex justify-between items-center mb-6 sticky top-0 z-50 transition-colors">
+        <a href="index.html" class="text-blue-600 dark:text-blue-400 font-bold hover:bg-blue-50 dark:hover:bg-gray-700 px-3 py-2 rounded-lg transition flex items-center">
+            <span class="mr-2">⬅</span> Volver
+        </a>
+        <h1 class="text-lg font-bold truncate max-w-[200px]" id="header-title">Cargando...</h1>
+        <div id="status-indicator" class="text-[10px] font-black uppercase bg-green-100 text-green-700 px-2 py-1 rounded hidden">Sincronizado</div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto p-4 md:p-6 relative">
+        
+        <div id="toast-guardado" class="fixed top-20 right-5 bg-gray-800 dark:bg-blue-600 text-white px-4 py-2 rounded shadow-lg transform transition-all duration-300 translate-x-full opacity-0 z-50 flex items-center">
+            <span class="mr-2">💾</span> <span id="toast-mensaje">¡Guardado!</span>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg border-t-4 border-blue-500 mb-10 relative transition-colors">
+            
+            <div class="absolute top-4 right-4 flex space-x-2">
+                <button onclick="abrirModalEdicion()" class="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-500 hover:bg-yellow-200 p-2 rounded-full transition" title="Editar">✏️</button>
+                <button onclick="borrarContenido()" class="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-500 hover:bg-red-200 p-2 rounded-full transition" title="Eliminar">🗑️</button>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-8 mb-8 border-b dark:border-gray-700 pb-8 mt-8 md:mt-0 items-start">
+                <div class="w-full md:w-52 flex-shrink-0">
+                    <img id="item-cover" src="https://via.placeholder.com/300x450?text=Sin+Portada" alt="Portada" class="w-full rounded-xl shadow-lg object-cover aspect-[2/3]">
+                </div>
+
+                <div class="w-full">
+                    <h2 id="item-title" class="text-3xl font-black mb-3 pr-12 leading-tight uppercase italic">Cargando...</h2>
+                    <span id="item-type" class="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest"></span>
+                    
+                    <div class="mt-8 w-full md:w-64">
+                        <label class="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase mb-2">Estado Actual</label>
+                        <select id="status" class="block w-full rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 border p-3 text-sm font-bold text-gray-700 dark:text-gray-200 shadow-sm focus:ring-2 focus:ring-blue-500 outline-none" onchange="actualizarEstado()">
+                            <option value="pendiente">Pendiente</option>
+                            <option value="viendo">Viendo / Leyendo</option>
+                            <option value="pausado">Pausado</option>
+                            <option value="completado">Completado</option>
+                            <option value="abandonado">Abandonado</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="progreso-series" class="hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold">Episodios</h3>
+                    <div class="flex items-center space-x-2 bg-blue-50 dark:bg-blue-900/20 p-1 rounded-xl border border-blue-100 dark:border-blue-900/30">
+                        <button onclick="ajustarTemporadaBotones(-1)" class="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:text-blue-500 transition-all font-bold">-</button>
+                        <div class="px-2 text-center">
+                            <span class="text-[10px] block uppercase text-blue-400 font-black">Temp.</span>
+                            <input type="number" id="current_season" class="w-8 bg-transparent text-center focus:outline-none font-bold text-blue-700 dark:text-blue-400" onchange="validarYActualizarTemporada()">
+                        </div>
+                        <button onclick="ajustarTemporadaBotones(1)" class="w-8 h-8 flex items-center justify-center bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:text-blue-500 transition-all font-bold">+</button>
+                    </div>
+                </div>
+                <p class="text-[10px] text-gray-400 dark:text-gray-500 mb-4 uppercase font-bold italic">* Temporadas disponibles: <span id="max-seasons-label">1</span>. Ajusta en el lápiz (✏️).</p>
+                <div id="cuadricula-episodios" class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-3"></div>
+            </div>
+
+            <div id="progreso-libros" class="hidden bg-gray-50 dark:bg-gray-700/30 p-6 rounded-2xl border border-gray-100 dark:border-gray-700">
+                <div class="flex justify-between items-center mb-3">
+                    <label class="text-sm font-bold text-gray-600 dark:text-gray-400">Progreso de Lectura</label>
+                    <span id="texto-paginas" class="text-sm font-black text-blue-600 dark:text-blue-400">0 / 0</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mb-6 overflow-hidden shadow-inner">
+                    <div id="barra-paginas" class="bg-blue-600 h-4 rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
+                </div>
+                
+                <div class="flex flex-col md:flex-row items-center gap-4">
+                    <div class="flex items-center space-x-2 bg-white dark:bg-gray-800 p-2 rounded-xl shadow-sm border dark:border-gray-700">
+                        <button onclick="cambiarPaginaManual(-1)" class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 font-bold transition-colors">-</button>
+                        <input type="number" id="current_page" class="w-20 text-center bg-transparent focus:outline-none text-xl font-bold text-blue-600" onchange="actualizarPaginaLibro()">
+                        <button onclick="cambiarPaginaManual(1)" class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 font-bold transition-colors">+</button>
+                    </div>
+                    
+                    <button onclick="actualizarPaginaLibro()" class="flex-1 w-full bg-blue-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-700 transition shadow-lg uppercase text-xs">Guardar Progreso</button>
+                    
+                    <button onclick="cambiarPaginaManual(10)" class="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-black px-4 py-3 rounded-xl hover:bg-blue-100 transition-all text-xs whitespace-nowrap">+ 10</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="contenedor-notas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10"></div>
+    </div>
+
+    <div id="modal-editar" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden flex justify-center items-center z-[100] p-4">
+        <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-2xl w-full max-w-md transition-colors">
+            <h2 class="text-2xl font-black mb-6 text-gray-900 dark:text-white uppercase italic">Editar Registro</h2>
+            <form id="form-editar" class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase">Título</label>
+                    <input type="text" id="edit-title" required class="w-full rounded-xl border dark:border-gray-700 dark:bg-gray-700 p-3 outline-none focus:ring-2 focus:ring-blue-500 font-bold">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase">URL Portada</label>
+                    <input type="url" id="edit-cover-url" class="w-full rounded-xl border dark:border-gray-700 dark:bg-gray-700 p-3 text-sm outline-none">
+                </div>
+                <div id="edit-series-fields" class="hidden grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">Temp. Totales</label>
+                        <input type="number" id="edit-total-seasons" min="1" class="w-full rounded-xl border dark:border-gray-700 dark:bg-gray-700 p-3">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">Eps. Temp. Seleccionada</label>
+                        <input type="number" id="edit-total-episodes" min="1" class="w-full rounded-xl border dark:border-gray-700 dark:bg-gray-700 p-3">
+                    </div>
+                </div>
+                <div id="edit-libros-fields" class="hidden">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase">Total Páginas</label>
+                    <input type="number" id="edit-total-pages" min="1" class="w-full rounded-xl border dark:border-gray-700 dark:bg-gray-700 p-3">
+                </div>
+                <div class="flex justify-end space-x-3 mt-8">
+                    <button type="button" onclick="cerrarModalEdicion()" class="px-5 py-2 text-gray-400 font-bold uppercase text-xs">Cancelar</button>
+                    <button type="submit" class="bg-blue-600 text-white px-8 py-2.5 rounded-xl font-bold shadow-lg uppercase text-xs">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+        const USER_ID = localStorage.getItem('user_id');
+        const ITEM_ID = new URLSearchParams(window.location.search).get('id');
+        let itemActual = null;
+
+        if (!USER_ID || !ITEM_ID) window.location.href = 'index.html';
+        if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+
+        function mostrarToast(m) {
+            const t = document.getElementById('toast-guardado');
+            document.getElementById('toast-mensaje').textContent = m;
+            t.classList.remove('translate-x-full', 'opacity-0');
+            setTimeout(() => t.classList.add('translate-x-full', 'opacity-0'), 2500);
+        }
+
+        async function cargarDetalle() {
+            try {
+                const res = await fetch(`${API_URL}/media/usuario/${USER_ID}`);
+                const data = await res.json();
+                itemActual = data.datos.find(i => i.id === ITEM_ID);
+                if (!itemActual) return window.location.href = 'index.html';
+
+                if (typeof itemActual.total_episodes !== 'object' || itemActual.total_episodes === null) {
+                    itemActual.total_episodes = { "1": itemActual.total_episodes || 12 };
+                }
+
+                document.getElementById('header-title').textContent = itemActual.title;
+                document.getElementById('item-title').textContent = itemActual.title;
+                document.getElementById('item-type').textContent = itemActual.media_type;
+                document.getElementById('status').value = itemActual.status;
+                if (itemActual.cover_image_url) document.getElementById('item-cover').src = itemActual.cover_image_url;
+
+                if (itemActual.media_type === "Serie" || itemActual.media_type === "Anime") {
+                    document.getElementById('progreso-series').classList.remove("hidden");
+                    const inputTemp = document.getElementById('current_season');
+                    inputTemp.value = itemActual.current_season || 1;
+                    const maxT = itemActual.total_seasons || 1;
+                    document.getElementById('max-seasons-label').textContent = maxT;
+                    inputTemp.max = maxT;
+                    dibujarCuadricula();
+                } else if (itemActual.media_type === "Libro") {
+                    document.getElementById('progreso-libros').classList.remove("hidden");
+                    actualizarBarraLibro();
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        // --- FUNCIONES PARA LIBROS ---
+        function cambiarPaginaManual(cantidad) {
+            const input = document.getElementById('current_page');
+            let nuevaPagina = (parseInt(input.value) || 0) + cantidad;
+            const total = itemActual.total_pages || 9999;
+
+            if (nuevaPagina < 0) nuevaPagina = 0;
+            if (nuevaPagina > total) {
+                nuevaPagina = total;
+                mostrarToast("Llegaste al final del libro");
+            }
+            input.value = nuevaPagina;
+            // No guardamos automáticamente para dejar que el usuario use los botones varias veces antes de confirmar
+        }
+
+        function actualizarPaginaLibro() {
+            const pag = parseInt(document.getElementById('current_page').value) || 0;
+            itemActual.current_page = pag;
+            if(itemActual.status === 'pendiente' && pag > 0) { 
+                itemActual.status = 'viendo'; 
+                document.getElementById('status').value = 'viendo'; 
+            }
+            actualizarBarraLibro();
+            guardarEnBackend({ current_page: pag, status: itemActual.status });
+        }
+
+        function actualizarBarraLibro() {
+            const pag = itemActual.current_page || 0; const total = itemActual.total_pages || 0;
+            document.getElementById('current_page').value = pag;
+            document.getElementById('texto-paginas').textContent = total > 0 ? `${pag} / ${total} Págs` : `${pag} Págs`;
+            document.getElementById('barra-paginas').style.width = total > 0 ? `${Math.min((pag/total)*100, 100)}%` : '0%';
+        }
+
+        // --- FUNCIONES PARA SERIES ---
+        function ajustarTemporadaBotones(cambio) {
+            const input = document.getElementById('current_season');
+            let nuevoValor = parseInt(input.value) + cambio;
+            const maximo = parseInt(input.max) || 1;
+            if (nuevoValor >= 1 && nuevoValor <= maximo) {
+                input.value = nuevoValor;
+                validarYActualizarTemporada();
+            } else if (nuevoValor > maximo) {
+                mostrarToast(`Máximo ${maximo} temporadas`);
+            }
+        }
+
+        function validarYActualizarTemporada() {
+            const input = document.getElementById('current_season');
+            let valor = parseInt(input.value);
+            const maximo = parseInt(input.max) || 1;
+            if (isNaN(valor) || valor < 1) valor = 1;
+            if (valor > maximo) { valor = maximo; mostrarToast(`Límite: ${maximo} temporadas`); }
+            input.value = valor;
+            dibujarCuadricula();
+        }
+
+        async function guardarEnBackend(datos) {
+            const fullData = { ...itemActual, ...datos, user_id: USER_ID };
+            await fetch(`${API_URL}/media/${ITEM_ID}`, { 
+                method: 'PUT', headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify(fullData) 
+            });
+            mostrarToast("Sincronizado");
+        }
+
+        function dibujarCuadricula() {
+            const cont = document.getElementById('cuadricula-episodios'); 
+            cont.innerHTML = "";
+            const tempVisual = document.getElementById('current_season').value;
+            const totalEpsEstaTemp = itemActual.total_episodes[tempVisual] || 12;
+
+            for (let i = 1; i <= totalEpsEstaTemp; i++) {
+                const btn = document.createElement('button');
+                const visto = (parseInt(tempVisual) < itemActual.current_season) || 
+                             (parseInt(tempVisual) === itemActual.current_season && i <= itemActual.current_episode);
+
+                btn.className = visto 
+                    ? "bg-green-500 text-white font-bold py-3 rounded-xl shadow-inner scale-95" 
+                    : "bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-400 font-bold py-3 rounded-xl hover:border-blue-500 transition-all";
+                
+                btn.innerHTML = visto ? `✓ ${i}` : i;
+                
+                btn.onclick = () => {
+                    itemActual.current_episode = i;
+                    itemActual.current_season = parseInt(tempVisual);
+                    if(itemActual.status === 'pendiente') { itemActual.status = 'viendo'; document.getElementById('status').value = 'viendo'; }
+                    dibujarCuadricula();
+                    guardarEnBackend({ current_episode: i, current_season: itemActual.current_season, status: itemActual.status });
+                };
+                cont.appendChild(btn);
+            }
+        }
+
+        function actualizarEstado() { itemActual.status = document.getElementById('status').value; guardarEnBackend({ status: itemActual.status }); }
+
+        function abrirModalEdicion() {
+            const tempVisual = document.getElementById('current_season').value;
+            document.getElementById('edit-title').value = itemActual.title;
+            document.getElementById('edit-cover-url').value = itemActual.cover_image_url || '';
+            const esVideo = itemActual.media_type === "Serie" || itemActual.media_type === "Anime";
+            const esLibro = itemActual.media_type === "Libro";
+            document.getElementById('edit-series-fields').classList.toggle('hidden', !esVideo);
+            document.getElementById('edit-libros-fields').classList.toggle('hidden', !esLibro);
+            if (esVideo) {
+                document.getElementById('edit-total-seasons').value = itemActual.total_seasons || 1;
+                document.getElementById('edit-total-episodes').value = itemActual.total_episodes[tempVisual] || 12;
+            }
+            if (esLibro) document.getElementById('edit-total-pages').value = itemActual.total_pages || '';
+            document.getElementById('modal-editar').classList.remove('hidden');
+        }
+
+        function cerrarModalEdicion() { document.getElementById('modal-editar').classList.add('hidden'); }
+
+        document.getElementById('form-editar').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const tempVisual = document.getElementById('current_season').value;
+            const nuevosEps = parseInt(document.getElementById('edit-total-episodes').value);
+            const nuevasTemps = parseInt(document.getElementById('edit-total-seasons').value) || 1;
+            itemActual.total_episodes[tempVisual] = nuevosEps;
+            itemActual.total_seasons = nuevasTemps;
+
+            const nuevosDatos = {
+                title: document.getElementById('edit-title').value,
+                cover_image_url: document.getElementById('edit-cover-url').value || null,
+                total_seasons: nuevasTemps,
+                total_episodes: itemActual.total_episodes,
+                total_pages: parseInt(document.getElementById('edit-total-pages').value) || null
+            };
+            await guardarEnBackend(nuevosDatos);
+            cerrarModalEdicion();
+            document.getElementById('current_season').max = nuevasTemps;
+            document.getElementById('max-seasons-label').textContent = nuevasTemps;
+            dibujarCuadricula();
+            if(itemActual.media_type === "Libro") actualizarBarraLibro();
+        });
+
+        async function borrarContenido() { if (confirm("¿Borrar definitivamente?")) { await fetch(`${API_URL}/media/${ITEM_ID}`, { method: 'DELETE' }); window.location.href = 'index.html'; } }
+
+        cargarDetalle();
+    </script>
+</body>
+</html>
