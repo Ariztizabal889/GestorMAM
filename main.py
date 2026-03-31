@@ -5,20 +5,21 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, validator, Field
 from supabase import create_client, Client
-from dotenv import load_dotenv
+# Ya no necesitamos load_dotenv en producción, pero lo dejamos por si acaso
 
-# 1. CONFIGURACIÓN
-load_dotenv()
+# 1. CONFIGURACIÓN (Optimizada para Render)
 url: str = os.getenv("SUPABASE_URL")
-key: str = os.getenv("SUPABASE_KEY") # Debe ser la Service Role Key para RLS
+key: str = os.getenv("SUPABASE_KEY")
 
 if not url or not key:
-    raise ValueError("Faltan variables de entorno SUPABASE_URL o SUPABASE_KEY")
+    # Este print aparecerá en los Logs de Render si algo falla
+    print("❌ ERROR: SUPABASE_URL o SUPABASE_KEY no configuradas en Environment")
+    raise ValueError("Faltan variables de entorno")
 
 supabase: Client = create_client(url, key)
 app = FastAPI(title="Gestor de Entretenimiento API Pro")
 
-# 2. CORS
+# 2. CORS (Vital para que GitHub Pages pueda hablar con Render)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -27,7 +28,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 3. MODELOS DE DATOS (Coincidentes con tu SQL)
+# RUTA DE BIENVENIDA (Para evitar el "Not Found" al entrar a la URL)
+@app.get("/")
+async def root():
+    return {"status": "online", "message": "API de GestorMAM funcionando"}
+
+# 3. MODELOS DE DATOS
 class MediaItem(BaseModel):
     user_id: str
     title: str
@@ -67,11 +73,9 @@ class NoteItem(BaseModel):
         return v
 
 # 4. RUTAS PARA MEDIA_ITEMS (BIBLIOTECA)
-
 @app.get("/media/usuario/{user_id}")
 async def obtener_biblioteca(user_id: str):
     try:
-        # IMPORTANTE: Cambiado de 'media' a 'media_items'
         res = supabase.table("media_items").select("*").eq("user_id", user_id).order("updated_at", desc=True).execute()
         return {"datos": res.data}
     except Exception as e:
@@ -91,8 +95,8 @@ async def crear_contenido(item: MediaItem):
 async def actualizar_contenido(item_id: str, item: MediaItem):
     try:
         datos = {k: v for k, v in item.dict().items() if v is not None}
-        # Forzamos la actualización de la fecha de auditoría
-        datos["updated_at"] = "now()" 
+        # Nota: updated_at se suele manejar en Supabase con triggers, 
+        # pero esto asegura que se marque el cambio
         res = supabase.table("media_items").update(datos).eq("id", item_id).execute()
         return {"mensaje": "Actualizado", "datos": res.data}
     except Exception as e:
@@ -109,7 +113,6 @@ async def borrar_contenido(item_id: str):
         raise HTTPException(status_code=400, detail=str(e))
 
 # 5. RUTAS PARA NOTAS
-
 @app.get("/notas/usuario/{user_id}")
 async def obtener_notas(user_id: str):
     try:
@@ -137,18 +140,12 @@ async def borrar_nota(nota_id: str):
         print(f"Error en DELETE notes: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
-
 @app.put("/notas/{nota_id}")
 async def actualizar_nota(nota_id: str, nota: NoteItem):
     try:
-        # Solo actualizamos los campos que no son None
         datos_nota = {k: v for k, v in nota.dict().items() if v is not None}
         res = supabase.table("notes").update(datos_nota).eq("id", nota_id).execute()
         return {"mensaje": "Nota actualizada", "datos": res.data}
     except Exception as e:
         print(f"DEBUG ERROR PUT NOTAS: {e}")
-        raise HTTPException(status_code=400, detail="No se pudo actualizar la nota")       
-
-#if __name__ == "__main__":
- #   import uvicorn
- #   uvicorn.run(app, host="127.0.0.1", port=8000)
+        raise HTTPException(status_code=400, detail="No se pudo actualizar la nota")
