@@ -149,6 +149,6 @@ async def actualizar_nota(nota_id: str, nota: NoteItem):
         print(f"DEBUG ERROR PUT NOTAS: {e}")
         raise HTTPException(status_code=400, detail="No se pudo actualizar la nota")       
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+#if __name__ == "__main__":
+ #   import uvicorn
+ #   uvicorn.run(app, host="127.0.0.1", port=8000)
