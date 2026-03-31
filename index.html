@@ -95,36 +95,18 @@
                 
                 <div id="edit-campos-series" class="hidden space-y-4">
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-1">
-                            <label class="text-[9px] font-black uppercase ml-2 text-gray-400">Temps Totales</label>
-                            <input type="number" id="edit-total-seasons" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700">
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-[9px] font-black uppercase ml-2 text-gray-400">Episodios Totales</label>
-                            <input type="number" id="edit-total-episodes" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700">
-                        </div>
+                        <input type="number" id="edit-total-seasons" placeholder="Temps Totales" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700">
+                        <input type="number" id="edit-total-episodes" placeholder="Episodios Totales" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700">
                     </div>
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-1">
-                            <label class="text-[9px] font-black uppercase ml-2 text-blue-500">Temp Actual</label>
-                            <input type="number" id="edit-current-season" class="w-full border border-blue-200 dark:border-blue-900 p-4 rounded-2xl font-bold bg-blue-50/50 dark:bg-gray-700">
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-[9px] font-black uppercase ml-2 text-blue-500">Ep Actual</label>
-                            <input type="number" id="edit-current-episode" class="w-full border border-blue-200 dark:border-blue-900 p-4 rounded-2xl font-bold bg-blue-50/50 dark:bg-gray-700">
-                        </div>
+                        <input type="number" id="edit-current-season" placeholder="Temp Actual" class="w-full border border-blue-200 p-4 rounded-2xl font-bold bg-blue-50 dark:bg-gray-700">
+                        <input type="number" id="edit-current-episode" placeholder="Ep Actual" class="w-full border border-blue-200 p-4 rounded-2xl font-bold bg-blue-50 dark:bg-gray-700">
                     </div>
                 </div>
 
                 <div id="edit-campos-libros" class="hidden space-y-4">
-                    <div class="space-y-1">
-                        <label class="text-[9px] font-black uppercase ml-2 text-gray-400">Páginas Totales</label>
-                        <input type="number" id="edit-total-pages" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700">
-                    </div>
-                    <div class="space-y-1">
-                        <label class="text-[9px] font-black uppercase ml-2 text-emerald-500">Página Actual</label>
-                        <input type="number" id="edit-current-page" class="w-full border border-emerald-200 dark:border-emerald-900 p-4 rounded-2xl font-bold bg-emerald-50/50 dark:bg-gray-700">
-                    </div>
+                    <input type="number" id="edit-total-pages" placeholder="Páginas Totales" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700">
+                    <input type="number" id="edit-current-page" placeholder="Página Actual" class="w-full border border-emerald-200 p-4 rounded-2xl font-bold bg-emerald-50 dark:bg-gray-700">
                 </div>
 
                 <div class="flex justify-center space-x-4 mt-8 pt-4 border-t dark:border-gray-700">
@@ -178,14 +160,29 @@
         // --- LÓGICA DE AUTO-COMPLETADO ---
         function verificarCompletado(item) {
             let esCompletado = false;
+            
+            // Convertimos a números para evitar errores de comparación de strings
+            const curSe = Number(item.current_season);
+            const totSe = Number(item.total_seasons);
+            const curEp = Number(item.current_episode);
+            const totEp = Number(item.total_episodes);
+            const curPa = Number(item.current_page);
+            const totPa = Number(item.total_pages);
+
             if (item.media_type === "Libro") {
-                if (item.current_page >= item.total_pages && item.total_pages > 0) esCompletado = true;
+                if (curPa >= totPa && totPa > 0) esCompletado = true;
             } else if (item.media_type === "Serie" || item.media_type === "Anime") {
-                if (item.current_season >= item.total_seasons && item.current_episode >= item.total_episodes && item.total_episodes > 0) esCompletado = true;
+                // Se completa si llegó a la última temporada Y al último episodio
+                if (curSe >= totSe && curEp >= totEp && totEp > 0) esCompletado = true;
             } else if (item.media_type === "Pelicula") {
-                // Las películas se pueden marcar manualmente en detalles, aquí las dejamos igual
+                // Las películas suelen ser un solo registro, se marcan en Detalles
             }
-            if (esCompletado) item.status = "completado";
+
+            if (esCompletado) {
+                item.status = "completado";
+            } else {
+                item.status = "pendiente";
+            }
             return item;
         }
 
@@ -198,7 +195,6 @@
                 contenedor.innerHTML = "";
 
                 misContenidos.forEach(item => {
-                    // EXCLUSIÓN DE COMPLETADOS
                     if (item.status && item.status.toLowerCase() === "completado") return;
 
                     const img = item.cover_image_url || 'https://via.placeholder.com/300x450?text=Sin+Portada';
@@ -262,6 +258,8 @@
 
         document.getElementById('form-editar').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // Recogemos todos los campos numéricos
             let datos = {
                 ...itemAEditar,
                 title: document.getElementById('edit-title').value,
@@ -270,10 +268,11 @@
                 total_episodes: parseInt(document.getElementById('edit-total-episodes').value) || 0,
                 current_season: parseInt(document.getElementById('edit-current-season').value) || 1,
                 current_episode: parseInt(document.getElementById('edit-current-episode').value) || 0,
-                total_pages: parseInt(document.getElementById('edit-total-pages').value) || null,
+                total_pages: parseInt(document.getElementById('edit-total-pages').value) || 0,
                 current_page: parseInt(document.getElementById('edit-current-page').value) || 0
             };
 
+            // Ejecutamos la lógica de completado automático
             datos = verificarCompletado(datos);
 
             await fetch(`${API_URL}/media/${itemAEditar.id}`, { 
@@ -294,20 +293,13 @@
                 cover_image_url: document.getElementById("cover_image_url").value || null,
                 total_seasons: parseInt(document.getElementById("total_seasons").value) || 1,
                 total_episodes: parseInt(document.getElementById("total_episodes").value) || 0,
-                total_pages: parseInt(document.getElementById("total_pages").value) || null,
+                total_pages: parseInt(document.getElementById("total_pages").value) || 0,
                 status: "pendiente"
             };
             await fetch(`${API_URL}/media/`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(item) });
             document.getElementById("formulario-media").reset();
             cargarContenido();
         });
-
-        function setFiltro(tipo, valor) {
-            filtroCategoria = valor;
-            document.querySelectorAll('.filter-btn-cat').forEach(b => b.classList.remove('active-pill'));
-            document.querySelector(`.filter-btn-cat[data-val="${valor}"]`).classList.add('active-pill');
-            filtrarTodo();
-        }
 
         function filtrarTodo() {
             const texto = document.getElementById('buscador').value.toLowerCase();
@@ -319,6 +311,13 @@
                 if (mT && mC) { t.style.display = "flex"; visibles++; } else { t.style.display = "none"; }
             });
             document.getElementById('contador-resultados').textContent = `${visibles} EN CURSO`;
+        }
+
+        function setFiltro(tipo, valor) {
+            filtroCategoria = valor;
+            document.querySelectorAll('.filter-btn-cat').forEach(b => b.classList.remove('active-pill'));
+            document.querySelector(`.filter-btn-cat[data-val="${valor}"]`).classList.add('active-pill');
+            filtrarTodo();
         }
 
         cargarContenido();
