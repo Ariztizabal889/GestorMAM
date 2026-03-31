@@ -25,24 +25,22 @@
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex flex-wrap items-center justify-center gap-2">
                 <h1 class="text-xl md:text-3xl font-black tracking-tighter text-blue-600 italic uppercase mr-2">🎬 GestorMAM</h1>
-                <a href="biblioteca.html" class="bg-slate-100 dark:bg-gray-700 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-gray-600 transition shadow-sm">🖼️ Galería</a>
+                <a href="biblioteca.html" class="bg-slate-100 dark:bg-gray-700 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-slate-200 transition shadow-sm">🖼️ Galería</a>
                 <a href="importar_series.html" class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-blue-200 transition shadow-sm">📺 Series y ⛩️ Anime</a>
                 <a href="importar_libros.html" class="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-3 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-emerald-200 transition shadow-sm">📚 Libros</a>
             </div>
             <div class="flex items-center space-x-2">
                 <a href="notas_generales.html" class="bg-yellow-400 text-yellow-900 px-3 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-yellow-300 transition shadow-sm">📝 Notas</a>
-                <button onclick="exportarBiblioteca()" class="bg-green-600 text-white px-3 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-green-500 transition shadow-sm flex items-center">
-                    📊 <span class="hidden lg:inline ml-1">Exportar</span>
-                </button>
+                <button onclick="exportarBiblioteca()" class="bg-green-600 text-white px-3 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-green-500 transition shadow-sm flex items-center">📊 Exportar</button>
                 <div class="h-8 w-[1px] bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                <button onclick="toggleDarkMode()" id="dark-mode-btn" class="p-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all text-lg">🌙</button>
-                <button onclick="cerrarSesion()" class="text-red-500 font-black text-[9px] uppercase tracking-widest hover:underline decoration-2 underline-offset-4 cursor-pointer">Cerrar</button>
+                <button onclick="toggleDarkMode()" id="dark-mode-btn" class="p-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 transition-all text-lg">🌙</button>
+                <button onclick="cerrarSesion()" class="text-red-500 font-black text-[9px] uppercase tracking-widest hover:underline cursor-pointer">Cerrar</button>
             </div>
         </div>
     </nav>
 
     <div class="max-w-6xl mx-auto px-4 mt-8">
-        <details class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm mb-8 border border-gray-200 dark:border-gray-700 overflow-hidden group transition-colors">
+        <details class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm mb-8 border border-gray-200 dark:border-gray-700 overflow-hidden group">
             <summary class="list-none p-6 cursor-pointer font-black text-gray-700 dark:text-gray-300 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 uppercase text-xs tracking-widest">
                 <span>✨ Añadir Manualmente</span>
                 <span class="group-open:rotate-180 transition-transform">▼</span>
@@ -64,20 +62,20 @@
                     <div id="campos-libros" class="md:col-span-2 hidden">
                         <input type="number" id="total_pages" placeholder="Total Páginas" class="w-full rounded-2xl border dark:border-gray-600 p-4 font-bold dark:bg-gray-700">
                     </div>
-                    <button type="submit" class="md:col-span-2 w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-xl uppercase tracking-[0.2em] hover:bg-blue-700 transition-all active:scale-95 text-xs">Guardar en Biblioteca</button>
+                    <button type="submit" class="md:col-span-2 w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-xl uppercase hover:bg-blue-700 transition-all text-xs">Guardar en Biblioteca</button>
                 </form>
             </div>
         </details>
 
         <div class="mb-10 space-y-6">
-            <input type="text" id="buscador" onkeyup="filtrarTodo()" placeholder="🔍 Buscar en curso..." class="w-full p-5 rounded-[2rem] border-none shadow-md text-xl outline-none focus:ring-4 focus:ring-blue-100 dark:bg-gray-800 dark:text-white transition-all font-bold">
+            <input type="text" id="buscador" onkeyup="filtrarTodo()" placeholder="🔍 Buscar en curso..." class="w-full p-5 rounded-[2rem] shadow-md text-xl outline-none focus:ring-4 focus:ring-blue-100 dark:bg-gray-800 dark:text-white font-bold">
             <div class="flex flex-wrap gap-4 items-center justify-between">
                 <div class="flex bg-white dark:bg-gray-800 rounded-2xl p-1 shadow-sm border border-gray-200 dark:border-gray-700 overflow-x-auto no-scrollbar">
                     <button onclick="setFiltro('cat', 'todos')" class="filter-btn filter-btn-cat active-pill px-6 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap" data-val="todos">Todos</button>
-                    <button onclick="setFiltro('cat', 'Serie')" class="filter-btn filter-btn-cat px-6 py-2 rounded-xl text-[10px] font-black uppercase text-gray-400 dark:text-gray-500 whitespace-nowrap" data-val="Serie">Series</button>
-                    <button onclick="setFiltro('cat', 'Anime')" class="filter-btn filter-btn-cat px-6 py-2 rounded-xl text-[10px] font-black uppercase text-gray-400 dark:text-gray-500 whitespace-nowrap" data-val="Anime">Anime</button>
-                    <button onclick="setFiltro('cat', 'Libro')" class="filter-btn filter-btn-cat px-6 py-2 rounded-xl text-[10px] font-black uppercase text-gray-400 dark:text-gray-500 whitespace-nowrap" data-val="Libro">Libros</button>
-                    <button onclick="setFiltro('cat', 'Pelicula')" class="filter-btn filter-btn-cat px-6 py-2 rounded-xl text-[10px] font-black uppercase text-gray-400 dark:text-gray-500 whitespace-nowrap" data-val="Pelicula">Películas</button>
+                    <button onclick="setFiltro('cat', 'Serie')" class="filter-btn filter-btn-cat px-6 py-2 rounded-xl text-[10px] font-black uppercase text-gray-400 whitespace-nowrap" data-val="Serie">Series</button>
+                    <button onclick="setFiltro('cat', 'Anime')" class="filter-btn filter-btn-cat px-6 py-2 rounded-xl text-[10px] font-black uppercase text-gray-400 whitespace-nowrap" data-val="Anime">Anime</button>
+                    <button onclick="setFiltro('cat', 'Libro')" class="filter-btn filter-btn-cat px-6 py-2 rounded-xl text-[10px] font-black uppercase text-gray-400 whitespace-nowrap" data-val="Libro">Libros</button>
+                    <button onclick="setFiltro('cat', 'Pelicula')" class="filter-btn filter-btn-cat px-6 py-2 rounded-xl text-[10px] font-black uppercase text-gray-400 whitespace-nowrap" data-val="Pelicula">Películas</button>
                 </div>
                 <div id="contador-resultados" class="text-[10px] font-black text-gray-400 uppercase tracking-widest">0 EN CURSO</div>
             </div>
@@ -91,22 +89,34 @@
             <h2 class="text-2xl font-black mb-6 uppercase italic text-gray-800 dark:text-white tracking-tighter text-center">Editar Registro</h2>
             <form id="form-editar" class="space-y-4">
                 <input type="text" id="edit-title" required class="w-full rounded-2xl border dark:border-gray-600 p-4 font-bold outline-none dark:bg-gray-700 text-gray-900 dark:text-white uppercase text-center">
-                <input type="url" id="edit-cover-url" class="w-full rounded-2xl border dark:border-gray-600 p-3 text-sm outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
+                <input type="url" id="edit-cover-url" class="w-full rounded-2xl border dark:border-gray-600 p-3 text-sm outline-none bg-gray-50 dark:bg-gray-700">
                 
-                <div id="edit-campos-series" class="hidden space-y-4">
+                <div id="edit-campos-series" class="hidden space-y-3">
                     <div class="grid grid-cols-2 gap-4">
-                        <input type="number" id="edit-total-seasons" placeholder="Temps Totales" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700">
-                        <input type="number" id="edit-total-episodes" placeholder="Episodios Totales" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700">
+                        <div class="space-y-1">
+                            <label class="text-[8px] font-black uppercase text-gray-400 ml-2">Total Temps</label>
+                            <input type="number" id="edit-total-seasons" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700 text-center">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[8px] font-black uppercase text-gray-400 ml-2">Total Eps</label>
+                            <input type="number" id="edit-total-episodes" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700 text-center">
+                        </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
-                        <input type="number" id="edit-current-season" placeholder="Temp Actual" class="w-full border border-blue-200 p-4 rounded-2xl font-bold bg-blue-50 dark:bg-gray-700">
-                        <input type="number" id="edit-current-episode" placeholder="Ep Actual" class="w-full border border-blue-200 p-4 rounded-2xl font-bold bg-blue-50 dark:bg-gray-700">
+                        <div class="space-y-1">
+                            <label class="text-[8px] font-black uppercase text-blue-500 ml-2">Tu Temp</label>
+                            <input type="number" id="edit-current-season" class="w-full border border-blue-200 dark:border-blue-900 p-4 rounded-2xl font-bold bg-blue-50/30 dark:bg-gray-700 text-center">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[8px] font-black uppercase text-blue-500 ml-2">Tu Ep</label>
+                            <input type="number" id="edit-current-episode" class="w-full border border-blue-200 dark:border-blue-900 p-4 rounded-2xl font-bold bg-blue-50/30 dark:bg-gray-700 text-center">
+                        </div>
                     </div>
                 </div>
 
-                <div id="edit-campos-libros" class="hidden space-y-4">
-                    <input type="number" id="edit-total-pages" placeholder="Páginas Totales" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700">
-                    <input type="number" id="edit-current-page" placeholder="Página Actual" class="w-full border border-emerald-200 p-4 rounded-2xl font-bold bg-emerald-50 dark:bg-gray-700">
+                <div id="edit-campos-libros" class="hidden space-y-3">
+                    <input type="number" id="edit-total-pages" placeholder="Páginas Totales" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700 text-center">
+                    <input type="number" id="edit-current-page" placeholder="Tu Página" class="w-full border border-emerald-200 p-4 rounded-2xl font-bold bg-emerald-50/30 dark:bg-gray-700 text-center">
                 </div>
 
                 <div class="flex justify-center space-x-4 mt-8 pt-4 border-t dark:border-gray-700">
@@ -134,55 +144,35 @@
 
         function toggleDarkMode() {
             const html = document.documentElement;
-            const btn = document.getElementById('dark-mode-btn');
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-                btn.innerHTML = '🌙';
-            } else {
-                html.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-                btn.innerHTML = '☀️';
-            }
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
         }
 
-        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-            const dmBtn = document.getElementById('dark-mode-btn');
-            if(dmBtn) dmBtn.innerHTML = '☀️';
-        }
+        if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
 
         function alternarCamposForm(cat) {
             document.getElementById("campos-series").classList.toggle("hidden", cat === "Pelicula" || cat === "Libro");
             document.getElementById("campos-libros").classList.toggle("hidden", cat !== "Libro");
         }
 
-        // --- LÓGICA DE AUTO-COMPLETADO ---
+        // --- LÓGICA DE AUTO-COMPLETADO (MEJORADA) ---
         function verificarCompletado(item) {
-            let esCompletado = false;
-            
-            // Convertimos a números para evitar errores de comparación de strings
-            const curSe = Number(item.current_season);
-            const totSe = Number(item.total_seasons);
-            const curEp = Number(item.current_episode);
-            const totEp = Number(item.total_episodes);
-            const curPa = Number(item.current_page);
-            const totPa = Number(item.total_pages);
+            const curSe = parseInt(item.current_season) || 1;
+            const totSe = parseInt(item.total_seasons) || 1;
+            const curEp = parseInt(item.current_episode) || 0;
+            const totEp = parseInt(item.total_episodes) || 0;
+            const curPa = parseInt(item.current_page) || 0;
+            const totPa = parseInt(item.total_pages) || 0;
+
+            let completado = false;
 
             if (item.media_type === "Libro") {
-                if (curPa >= totPa && totPa > 0) esCompletado = true;
+                if (curPa >= totPa && totPa > 0) completado = true;
             } else if (item.media_type === "Serie" || item.media_type === "Anime") {
-                // Se completa si llegó a la última temporada Y al último episodio
-                if (curSe >= totSe && curEp >= totEp && totEp > 0) esCompletado = true;
-            } else if (item.media_type === "Pelicula") {
-                // Las películas suelen ser un solo registro, se marcan en Detalles
+                if (curSe >= totSe && curEp >= totEp && totEp > 0) completado = true;
             }
 
-            if (esCompletado) {
-                item.status = "completado";
-            } else {
-                item.status = "pendiente";
-            }
+            item.status = completado ? "completado" : "pendiente";
             return item;
         }
 
@@ -195,30 +185,31 @@
                 contenedor.innerHTML = "";
 
                 misContenidos.forEach(item => {
+                    // EXCLUSIÓN: No mostrar si está completado
                     if (item.status && item.status.toLowerCase() === "completado") return;
 
                     const img = item.cover_image_url || 'https://via.placeholder.com/300x450?text=Sin+Portada';
                     let progreso = item.media_type === "Libro" ? `Pág. ${item.current_page}` : (item.media_type === "Pelicula" ? "Cine" : `T${item.current_season}-E${item.current_episode}`);
 
                     const div = document.createElement('div');
-                    div.className = "tarjeta-contenido group bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm overflow-hidden flex flex-col relative border border-gray-100 dark:border-gray-700 transition-colors";
+                    div.className = "tarjeta-contenido group bg-white dark:bg-gray-800 rounded-[2.5rem] shadow-sm overflow-hidden flex flex-col relative border border-gray-100 dark:border-gray-700";
                     div.setAttribute('data-titulo', item.title);
                     div.setAttribute('data-categoria', item.media_type);
 
                     div.innerHTML = `
                         <div class="absolute top-4 right-4 flex space-x-2 z-20">
-                            <button onclick="abrirModalEdicion('${item.id}')" class="bg-white/90 dark:bg-gray-700 text-blue-600 dark:text-blue-400 w-10 h-10 rounded-full shadow-lg flex items-center justify-center font-bold">✏️</button>
-                            <button onclick="borrarDirecto('${item.id}', '${item.title.replace(/'/g, "\\'")}')" class="bg-white/90 dark:bg-gray-700 text-red-500 w-10 h-10 rounded-full shadow-lg flex items-center justify-center font-bold">🗑️</button>
+                            <button onclick="abrirModalEdicion('${item.id}')" class="bg-white/90 dark:bg-gray-700 text-blue-600 w-10 h-10 rounded-full shadow-lg flex items-center justify-center">✏️</button>
+                            <button onclick="borrarDirecto('${item.id}', '${item.title.replace(/'/g, "\\'")}')" class="bg-white/90 dark:bg-gray-700 text-red-500 w-10 h-10 rounded-full shadow-lg flex items-center justify-center">🗑️</button>
                         </div>
                         <div class="h-80 w-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105" style="background-image: url('${img}')"></div>
                         <div class="p-6 flex-1 flex flex-col">
-                            <span class="text-[10px] font-black text-blue-500 dark:text-blue-400 uppercase tracking-widest mb-1">${item.media_type}</span>
-                            <h3 class="title-text font-black text-gray-900 dark:text-white text-xl leading-tight mb-4 italic uppercase line-clamp-2"></h3>
+                            <span class="text-[10px] font-black text-blue-500 uppercase tracking-widest mb-1">${item.media_type}</span>
+                            <h3 class="title-text font-black text-gray-900 dark:text-white text-xl uppercase italic line-clamp-2"></h3>
                             <div class="flex justify-between items-center mt-auto bg-gray-50 dark:bg-gray-700 p-3 rounded-2xl font-black text-xs">
-                                <span class="text-gray-400 uppercase tracking-tighter">${item.status}</span>
-                                <span class="text-blue-600 dark:text-blue-400 font-black">${progreso}</span>
+                                <span class="text-gray-400 uppercase">${item.status}</span>
+                                <span class="text-blue-600 dark:text-blue-400">${progreso}</span>
                             </div>
-                            <a href="detalle.html?id=${item.id}" class="mt-5 block text-center bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-[10px] font-black py-4 rounded-2xl hover:bg-blue-600 transition-all uppercase tracking-widest shadow-lg">Detalles</a>
+                            <a href="detalle.html?id=${item.id}" class="mt-5 block text-center bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-[10px] font-black py-4 rounded-2xl hover:bg-blue-600 hover:text-white transition-all uppercase tracking-widest shadow-lg">Detalles</a>
                         </div>
                     `;
                     div.querySelector('.title-text').textContent = item.title;
@@ -226,6 +217,13 @@
                 });
                 filtrarTodo();
             } catch (e) { console.error(e); }
+        }
+
+        async function borrarDirecto(id, titulo) {
+            if (confirm(`¿Eliminar "${titulo}"?`)) {
+                await fetch(`${API_URL}/media/${id}`, { method: 'DELETE' });
+                cargarContenido();
+            }
         }
 
         function abrirModalEdicion(id) {
@@ -245,12 +243,10 @@
                 document.getElementById('edit-total-episodes').value = item.total_episodes || 0;
                 document.getElementById('edit-current-season').value = item.current_season || 1;
                 document.getElementById('edit-current-episode').value = item.current_episode || 0;
-            }
-            if(esLibro) {
+            } else if(esLibro) {
                 document.getElementById('edit-total-pages').value = item.total_pages || 0;
                 document.getElementById('edit-current-page').value = item.current_page || 0;
             }
-
             document.getElementById('modal-editar').classList.remove('hidden');
         }
 
@@ -258,8 +254,6 @@
 
         document.getElementById('form-editar').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            // Recogemos todos los campos numéricos
             let datos = {
                 ...itemAEditar,
                 title: document.getElementById('edit-title').value,
@@ -272,7 +266,7 @@
                 current_page: parseInt(document.getElementById('edit-current-page').value) || 0
             };
 
-            // Ejecutamos la lógica de completado automático
+            // AUTO-COMPLETADO
             datos = verificarCompletado(datos);
 
             await fetch(`${API_URL}/media/${itemAEditar.id}`, { 
@@ -301,6 +295,13 @@
             cargarContenido();
         });
 
+        function setFiltro(tipo, valor) {
+            filtroCategoria = valor;
+            document.querySelectorAll('.filter-btn-cat').forEach(b => b.classList.remove('active-pill'));
+            document.querySelector(`.filter-btn-cat[data-val="${valor}"]`).classList.add('active-pill');
+            filtrarTodo();
+        }
+
         function filtrarTodo() {
             const texto = document.getElementById('buscador').value.toLowerCase();
             const tarjetas = document.querySelectorAll('.tarjeta-contenido');
@@ -311,13 +312,6 @@
                 if (mT && mC) { t.style.display = "flex"; visibles++; } else { t.style.display = "none"; }
             });
             document.getElementById('contador-resultados').textContent = `${visibles} EN CURSO`;
-        }
-
-        function setFiltro(tipo, valor) {
-            filtroCategoria = valor;
-            document.querySelectorAll('.filter-btn-cat').forEach(b => b.classList.remove('active-pill'));
-            document.querySelector(`.filter-btn-cat[data-val="${valor}"]`).classList.add('active-pill');
-            filtrarTodo();
         }
 
         cargarContenido();
