@@ -23,35 +23,25 @@
 
     <nav class="bg-white dark:bg-gray-800 shadow-md p-4 md:p-6 sticky top-0 z-50 transition-colors">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-            
             <div class="flex flex-wrap items-center justify-center gap-2">
                 <h1 class="text-xl md:text-3xl font-black tracking-tighter text-blue-600 italic uppercase mr-2">🎬 GestorMAM</h1>
-                
                 <a href="biblioteca.html" class="bg-slate-100 dark:bg-gray-700 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-gray-600 transition shadow-sm">🖼️ Galería</a>
-                
                 <a href="importar_series.html" class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-3 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-blue-200 transition shadow-sm">📺 Series y ⛩️ Anime</a>
-                                
                 <a href="importar_libros.html" class="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-3 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-emerald-200 transition shadow-sm">📚 Libros</a>
             </div>
-
             <div class="flex items-center space-x-2">
                 <a href="notas_generales.html" class="bg-yellow-400 text-yellow-900 px-3 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-yellow-300 transition shadow-sm">📝 Notas</a>
-                
                 <button onclick="exportarBiblioteca()" class="bg-green-600 text-white px-3 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-green-500 transition shadow-sm flex items-center">
                     📊 <span class="hidden lg:inline ml-1">Exportar</span>
                 </button>
-
                 <div class="h-8 w-[1px] bg-gray-200 dark:bg-gray-700 mx-1"></div>
-
                 <button onclick="toggleDarkMode()" id="dark-mode-btn" class="p-2 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all text-lg">🌙</button>
-                
                 <button onclick="cerrarSesion()" class="text-red-500 font-black text-[9px] uppercase tracking-widest hover:underline decoration-2 underline-offset-4 cursor-pointer">Cerrar</button>
             </div>
         </div>
     </nav>
 
     <div class="max-w-6xl mx-auto px-4 mt-8">
-        
         <details class="bg-white dark:bg-gray-800 rounded-[2rem] shadow-sm mb-8 border border-gray-200 dark:border-gray-700 overflow-hidden group transition-colors">
             <summary class="list-none p-6 cursor-pointer font-black text-gray-700 dark:text-gray-300 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700 uppercase text-xs tracking-widest">
                 <span>✨ Añadir Manualmente</span>
@@ -67,7 +57,6 @@
                         <option value="Libro">Libro</option>
                     </select>
                     <input type="url" id="cover_image_url" placeholder="URL Imagen Portada" class="md:col-span-2 w-full rounded-2xl border dark:border-gray-600 p-4 text-sm bg-gray-50 dark:bg-gray-700 outline-none">
-                    
                     <div id="campos-series" class="md:col-span-2 grid grid-cols-2 gap-4">
                         <input type="number" id="total_seasons" value="1" placeholder="Temps Totales" class="rounded-2xl border dark:border-gray-600 p-4 font-bold dark:bg-gray-700">
                         <input type="number" id="total_episodes" placeholder="Episodios Totales" class="rounded-2xl border dark:border-gray-600 p-4 font-bold dark:bg-gray-700">
@@ -75,14 +64,13 @@
                     <div id="campos-libros" class="md:col-span-2 hidden">
                         <input type="number" id="total_pages" placeholder="Total Páginas" class="w-full rounded-2xl border dark:border-gray-600 p-4 font-bold dark:bg-gray-700">
                     </div>
-                    
                     <button type="submit" class="md:col-span-2 w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-xl uppercase tracking-[0.2em] hover:bg-blue-700 transition-all active:scale-95 text-xs">Guardar en Biblioteca</button>
                 </form>
             </div>
         </details>
 
         <div class="mb-10 space-y-6">
-            <input type="text" id="buscador" onkeyup="filtrarTodo()" placeholder="🔍 Buscar en mi colección..." class="w-full p-5 rounded-[2rem] border-none shadow-md text-xl outline-none focus:ring-4 focus:ring-blue-100 dark:bg-gray-800 dark:text-white transition-all font-bold">
+            <input type="text" id="buscador" onkeyup="filtrarTodo()" placeholder="🔍 Buscar en curso..." class="w-full p-5 rounded-[2rem] border-none shadow-md text-xl outline-none focus:ring-4 focus:ring-blue-100 dark:bg-gray-800 dark:text-white transition-all font-bold">
             <div class="flex flex-wrap gap-4 items-center justify-between">
                 <div class="flex bg-white dark:bg-gray-800 rounded-2xl p-1 shadow-sm border border-gray-200 dark:border-gray-700 overflow-x-auto no-scrollbar">
                     <button onclick="setFiltro('cat', 'todos')" class="filter-btn filter-btn-cat active-pill px-6 py-2 rounded-xl text-[10px] font-black uppercase whitespace-nowrap" data-val="todos">Todos</button>
@@ -91,7 +79,7 @@
                     <button onclick="setFiltro('cat', 'Libro')" class="filter-btn filter-btn-cat px-6 py-2 rounded-xl text-[10px] font-black uppercase text-gray-400 dark:text-gray-500 whitespace-nowrap" data-val="Libro">Libros</button>
                     <button onclick="setFiltro('cat', 'Pelicula')" class="filter-btn filter-btn-cat px-6 py-2 rounded-xl text-[10px] font-black uppercase text-gray-400 dark:text-gray-500 whitespace-nowrap" data-val="Pelicula">Películas</button>
                 </div>
-                <div id="contador-resultados" class="text-[10px] font-black text-gray-400 uppercase tracking-widest">0 RESULTADOS</div>
+                <div id="contador-resultados" class="text-[10px] font-black text-gray-400 uppercase tracking-widest">0 EN CURSO</div>
             </div>
         </div>
 
@@ -104,13 +92,41 @@
             <form id="form-editar" class="space-y-4">
                 <input type="text" id="edit-title" required class="w-full rounded-2xl border dark:border-gray-600 p-4 font-bold outline-none dark:bg-gray-700 text-gray-900 dark:text-white uppercase text-center">
                 <input type="url" id="edit-cover-url" class="w-full rounded-2xl border dark:border-gray-600 p-3 text-sm outline-none bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
-                <div id="edit-campos-series" class="hidden grid grid-cols-2 gap-4">
-                    <input type="number" id="edit-total-seasons" placeholder="Temps" class="border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
-                    <input type="number" id="edit-total-episodes" placeholder="Episodios" class="border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white">
+                
+                <div id="edit-campos-series" class="hidden space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black uppercase ml-2 text-gray-400">Temps Totales</label>
+                            <input type="number" id="edit-total-seasons" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black uppercase ml-2 text-gray-400">Episodios Totales</label>
+                            <input type="number" id="edit-total-episodes" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black uppercase ml-2 text-blue-500">Temp Actual</label>
+                            <input type="number" id="edit-current-season" class="w-full border border-blue-200 dark:border-blue-900 p-4 rounded-2xl font-bold bg-blue-50/50 dark:bg-gray-700">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[9px] font-black uppercase ml-2 text-blue-500">Ep Actual</label>
+                            <input type="number" id="edit-current-episode" class="w-full border border-blue-200 dark:border-blue-900 p-4 rounded-2xl font-bold bg-blue-50/50 dark:bg-gray-700">
+                        </div>
+                    </div>
                 </div>
-                <div id="edit-campos-libros" class="hidden">
-                    <input type="number" id="edit-total-pages" placeholder="Páginas totales" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700 text-center text-gray-900 dark:text-white">
+
+                <div id="edit-campos-libros" class="hidden space-y-4">
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black uppercase ml-2 text-gray-400">Páginas Totales</label>
+                        <input type="number" id="edit-total-pages" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black uppercase ml-2 text-emerald-500">Página Actual</label>
+                        <input type="number" id="edit-current-page" class="w-full border border-emerald-200 dark:border-emerald-900 p-4 rounded-2xl font-bold bg-emerald-50/50 dark:bg-gray-700">
+                    </div>
                 </div>
+
                 <div class="flex justify-center space-x-4 mt-8 pt-4 border-t dark:border-gray-700">
                     <button type="button" onclick="cerrarModalEdicion()" class="text-gray-400 font-black uppercase text-[10px] tracking-widest">Cancelar</button>
                     <button type="submit" class="bg-blue-600 text-white px-8 py-4 rounded-2xl font-black uppercase text-[10px] shadow-lg tracking-widest active:scale-95">Actualizar</button>
@@ -122,7 +138,6 @@
     <script>
         const API_URL = "https://gestormam.onrender.com";
 
-        // --- SESIÓN ---
         window.cerrarSesion = function() {
             localStorage.removeItem('user_id');
             window.location.replace('login.html');
@@ -135,7 +150,6 @@
         let itemAEditar = null;
         let filtroCategoria = 'todos';
 
-        // --- MODO OSCURO ---
         function toggleDarkMode() {
             const html = document.documentElement;
             const btn = document.getElementById('dark-mode-btn');
@@ -156,23 +170,23 @@
             if(dmBtn) dmBtn.innerHTML = '☀️';
         }
 
-        // --- EXPORTAR ---
-        function exportarBiblioteca() {
-            if (misContenidos.length === 0) return alert("No hay datos");
-            let csv = "data:text/csv;charset=utf-8,Titulo,Tipo,Estado,Progreso\n";
-            misContenidos.forEach(item => {
-                let progreso = item.media_type === "Libro" ? item.current_page : `T${item.current_season}-E${item.current_episode}`;
-                csv += `"${item.title}",${item.media_type},${item.status},${progreso}\n`;
-            });
-            const link = document.createElement("a");
-            link.href = encodeURI(csv);
-            link.download = "Biblioteca.csv";
-            link.click();
-        }
-
         function alternarCamposForm(cat) {
             document.getElementById("campos-series").classList.toggle("hidden", cat === "Pelicula" || cat === "Libro");
             document.getElementById("campos-libros").classList.toggle("hidden", cat !== "Libro");
+        }
+
+        // --- LÓGICA DE AUTO-COMPLETADO ---
+        function verificarCompletado(item) {
+            let esCompletado = false;
+            if (item.media_type === "Libro") {
+                if (item.current_page >= item.total_pages && item.total_pages > 0) esCompletado = true;
+            } else if (item.media_type === "Serie" || item.media_type === "Anime") {
+                if (item.current_season >= item.total_seasons && item.current_episode >= item.total_episodes && item.total_episodes > 0) esCompletado = true;
+            } else if (item.media_type === "Pelicula") {
+                // Las películas se pueden marcar manualmente en detalles, aquí las dejamos igual
+            }
+            if (esCompletado) item.status = "completado";
+            return item;
         }
 
         async function cargarContenido() {
@@ -184,6 +198,9 @@
                 contenedor.innerHTML = "";
 
                 misContenidos.forEach(item => {
+                    // EXCLUSIÓN DE COMPLETADOS
+                    if (item.status && item.status.toLowerCase() === "completado") return;
+
                     const img = item.cover_image_url || 'https://via.placeholder.com/300x450?text=Sin+Portada';
                     let progreso = item.media_type === "Libro" ? `Pág. ${item.current_page}` : (item.media_type === "Pelicula" ? "Cine" : `T${item.current_season}-E${item.current_episode}`);
 
@@ -215,22 +232,29 @@
             } catch (e) { console.error(e); }
         }
 
-        async function borrarDirecto(id, titulo) {
-            if (confirm(`¿Eliminar "${titulo}"?`)) {
-                await fetch(`${API_URL}/media/${id}`, { method: 'DELETE' });
-                cargarContenido();
-            }
-        }
-
         function abrirModalEdicion(id) {
             const item = misContenidos.find(i => i.id === id);
             itemAEditar = item;
             document.getElementById('edit-title').value = item.title;
             document.getElementById('edit-cover-url').value = item.cover_image_url || '';
+            
             const esVideo = item.media_type === "Serie" || item.media_type === "Anime";
             const esLibro = item.media_type === "Libro";
+            
             document.getElementById('edit-campos-series').classList.toggle('hidden', !esVideo);
             document.getElementById('edit-campos-libros').classList.toggle('hidden', !esLibro);
+
+            if(esVideo) {
+                document.getElementById('edit-total-seasons').value = item.total_seasons || 1;
+                document.getElementById('edit-total-episodes').value = item.total_episodes || 0;
+                document.getElementById('edit-current-season').value = item.current_season || 1;
+                document.getElementById('edit-current-episode').value = item.current_episode || 0;
+            }
+            if(esLibro) {
+                document.getElementById('edit-total-pages').value = item.total_pages || 0;
+                document.getElementById('edit-current-page').value = item.current_page || 0;
+            }
+
             document.getElementById('modal-editar').classList.remove('hidden');
         }
 
@@ -238,15 +262,27 @@
 
         document.getElementById('form-editar').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const datos = {
+            let datos = {
                 ...itemAEditar,
                 title: document.getElementById('edit-title').value,
                 cover_image_url: document.getElementById('edit-cover-url').value || null,
                 total_seasons: parseInt(document.getElementById('edit-total-seasons').value) || 1,
-                total_pages: parseInt(document.getElementById('edit-total-pages').value) || null
+                total_episodes: parseInt(document.getElementById('edit-total-episodes').value) || 0,
+                current_season: parseInt(document.getElementById('edit-current-season').value) || 1,
+                current_episode: parseInt(document.getElementById('edit-current-episode').value) || 0,
+                total_pages: parseInt(document.getElementById('edit-total-pages').value) || null,
+                current_page: parseInt(document.getElementById('edit-current-page').value) || 0
             };
-            await fetch(`${API_URL}/media/${itemAEditar.id}`, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(datos) });
-            cerrarModalEdicion(); cargarContenido();
+
+            datos = verificarCompletado(datos);
+
+            await fetch(`${API_URL}/media/${itemAEditar.id}`, { 
+                method: 'PUT', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify(datos) 
+            });
+            cerrarModalEdicion(); 
+            cargarContenido();
         });
 
         document.getElementById("formulario-media").addEventListener("submit", async (e) => {
@@ -257,8 +293,9 @@
                 media_type: document.getElementById("media_type").value,
                 cover_image_url: document.getElementById("cover_image_url").value || null,
                 total_seasons: parseInt(document.getElementById("total_seasons").value) || 1,
-                total_episodes: {}, 
-                total_pages: parseInt(document.getElementById("total_pages").value) || null
+                total_episodes: parseInt(document.getElementById("total_episodes").value) || 0,
+                total_pages: parseInt(document.getElementById("total_pages").value) || null,
+                status: "pendiente"
             };
             await fetch(`${API_URL}/media/`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(item) });
             document.getElementById("formulario-media").reset();
@@ -281,7 +318,7 @@
                 const mC = filtroCategoria === 'todos' || t.getAttribute('data-categoria') === filtroCategoria;
                 if (mT && mC) { t.style.display = "flex"; visibles++; } else { t.style.display = "none"; }
             });
-            document.getElementById('contador-resultados').textContent = `${visibles} RESULTADOS`;
+            document.getElementById('contador-resultados').textContent = `${visibles} EN CURSO`;
         }
 
         cargarContenido();
