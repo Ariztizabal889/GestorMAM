@@ -95,28 +95,28 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-1">
                             <label class="text-[8px] font-black uppercase text-gray-400 ml-2">Total Temps</label>
-                            <input type="number" id="edit-total-seasons" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700 text-center">
+                            <input type="number" id="edit-total-seasons" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700 text-center text-gray-900 dark:text-white">
                         </div>
                         <div class="space-y-1">
                             <label class="text-[8px] font-black uppercase text-gray-400 ml-2">Total Eps</label>
-                            <input type="number" id="edit-total-episodes" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700 text-center">
+                            <input type="number" id="edit-total-episodes" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700 text-center text-gray-900 dark:text-white">
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-1">
                             <label class="text-[8px] font-black uppercase text-blue-500 ml-2">Tu Temp</label>
-                            <input type="number" id="edit-current-season" class="w-full border border-blue-200 dark:border-blue-900 p-4 rounded-2xl font-bold bg-blue-50/30 dark:bg-gray-700 text-center">
+                            <input type="number" id="edit-current-season" class="w-full border border-blue-200 dark:border-blue-900 p-4 rounded-2xl font-bold bg-blue-50/30 dark:bg-gray-700 text-center text-gray-900 dark:text-white">
                         </div>
                         <div class="space-y-1">
                             <label class="text-[8px] font-black uppercase text-blue-500 ml-2">Tu Ep</label>
-                            <input type="number" id="edit-current-episode" class="w-full border border-blue-200 dark:border-blue-900 p-4 rounded-2xl font-bold bg-blue-50/30 dark:bg-gray-700 text-center">
+                            <input type="number" id="edit-current-episode" class="w-full border border-blue-200 dark:border-blue-900 p-4 rounded-2xl font-bold bg-blue-50/30 dark:bg-gray-700 text-center text-gray-900 dark:text-white">
                         </div>
                     </div>
                 </div>
 
                 <div id="edit-campos-libros" class="hidden space-y-3">
-                    <input type="number" id="edit-total-pages" placeholder="Páginas Totales" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700 text-center">
-                    <input type="number" id="edit-current-page" placeholder="Tu Página" class="w-full border border-emerald-200 p-4 rounded-2xl font-bold bg-emerald-50/30 dark:bg-gray-700 text-center">
+                    <input type="number" id="edit-total-pages" placeholder="Páginas Totales" class="w-full border dark:border-gray-600 p-4 rounded-2xl font-bold bg-gray-50 dark:bg-gray-700 text-center text-gray-900 dark:text-white">
+                    <input type="number" id="edit-current-page" placeholder="Tu Página" class="w-full border border-emerald-200 p-4 rounded-2xl font-bold bg-emerald-50/30 dark:bg-gray-700 text-center text-gray-900 dark:text-white">
                 </div>
 
                 <div class="flex justify-center space-x-4 mt-8 pt-4 border-t dark:border-gray-700">
@@ -155,27 +155,6 @@
             document.getElementById("campos-libros").classList.toggle("hidden", cat !== "Libro");
         }
 
-        // --- LÓGICA DE AUTO-COMPLETADO (MEJORADA) ---
-        function verificarCompletado(item) {
-            const curSe = parseInt(item.current_season) || 1;
-            const totSe = parseInt(item.total_seasons) || 1;
-            const curEp = parseInt(item.current_episode) || 0;
-            const totEp = parseInt(item.total_episodes) || 0;
-            const curPa = parseInt(item.current_page) || 0;
-            const totPa = parseInt(item.total_pages) || 0;
-
-            let completado = false;
-
-            if (item.media_type === "Libro") {
-                if (curPa >= totPa && totPa > 0) completado = true;
-            } else if (item.media_type === "Serie" || item.media_type === "Anime") {
-                if (curSe >= totSe && curEp >= totEp && totEp > 0) completado = true;
-            }
-
-            item.status = completado ? "completado" : "pendiente";
-            return item;
-        }
-
         async function cargarContenido() {
             try {
                 const res = await fetch(`${API_URL}/media/usuario/${USER_ID}`);
@@ -207,7 +186,7 @@
                             <h3 class="title-text font-black text-gray-900 dark:text-white text-xl uppercase italic line-clamp-2"></h3>
                             <div class="flex justify-between items-center mt-auto bg-gray-50 dark:bg-gray-700 p-3 rounded-2xl font-black text-xs">
                                 <span class="text-gray-400 uppercase">${item.status}</span>
-                                <span class="text-blue-600 dark:text-blue-400">${progreso}</span>
+                                <span class="text-blue-600 dark:text-blue-400 font-black">${progreso}</span>
                             </div>
                             <a href="detalle.html?id=${item.id}" class="mt-5 block text-center bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 text-[10px] font-black py-4 rounded-2xl hover:bg-blue-600 hover:text-white transition-all uppercase tracking-widest shadow-lg">Detalles</a>
                         </div>
@@ -254,20 +233,36 @@
 
         document.getElementById('form-editar').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            // 1. Forzamos que los valores sean números para comparar correctamente
+            const curSe = parseInt(document.getElementById('edit-current-season')?.value) || 1;
+            const totSe = parseInt(document.getElementById('edit-total-seasons')?.value) || 1;
+            const curEp = parseInt(document.getElementById('edit-current-episode')?.value) || 0;
+            const totEp = parseInt(document.getElementById('edit-total-episodes')?.value) || 0;
+            const curPa = parseInt(document.getElementById('edit-current-page')?.value) || 0;
+            const totPa = parseInt(document.getElementById('edit-total-pages')?.value) || 0;
+
+            // 2. Lógica de completado directo antes de enviar
+            let nuevoEstado = "pendiente";
+            if (itemAEditar.media_type === "Libro") {
+                if (curPa >= totPa && totPa > 0) nuevoEstado = "completado";
+            } else if (itemAEditar.media_type === "Serie" || itemAEditar.media_type === "Anime") {
+                // Solo completado si llega a la última temporada y último episodio
+                if (curSe >= totSe && curEp >= totEp && totEp > 0) nuevoEstado = "completado";
+            }
+
             let datos = {
                 ...itemAEditar,
                 title: document.getElementById('edit-title').value,
                 cover_image_url: document.getElementById('edit-cover-url').value || null,
-                total_seasons: parseInt(document.getElementById('edit-total-seasons').value) || 1,
-                total_episodes: parseInt(document.getElementById('edit-total-episodes').value) || 0,
-                current_season: parseInt(document.getElementById('edit-current-season').value) || 1,
-                current_episode: parseInt(document.getElementById('edit-current-episode').value) || 0,
-                total_pages: parseInt(document.getElementById('edit-total-pages').value) || 0,
-                current_page: parseInt(document.getElementById('edit-current-page').value) || 0
+                total_seasons: totSe,
+                total_episodes: totEp,
+                current_season: curSe,
+                current_episode: curEp,
+                total_pages: totPa,
+                current_page: curPa,
+                status: nuevoEstado // <-- AQUI SE APLICA EL AUTOCOMPLETADO
             };
-
-            // AUTO-COMPLETADO
-            datos = verificarCompletado(datos);
 
             await fetch(`${API_URL}/media/${itemAEditar.id}`, { 
                 method: 'PUT', 
